@@ -1,0 +1,13 @@
+Copyright (c) 2025 Qian Ada  Li
+All rights reserved.
+
+Permission is hereby granted, free of charge, to use and redistribute this software for non-commercial research purposes,
+provided that appropriate credit is given to the original authors and this copyright notice is retained.
+
+If you modify this software, you must notify the copyright holder (Qian Li) prior to any redistribution of the modified
+version.
+
+Commercial use of this software is prohibited without prior written permission from the copyright holder.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
