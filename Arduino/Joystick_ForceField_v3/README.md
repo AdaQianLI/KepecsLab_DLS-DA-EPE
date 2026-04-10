@@ -4,7 +4,7 @@ This repository contains the Arduino control code for a joystick-based force-fie
 
 The current release file is:
 
-- `Joystick_ForceField_v3_ready_to_run.ino`
+- `Joystick_ForceField_v3.ino`
 
 ## What the code does
 
