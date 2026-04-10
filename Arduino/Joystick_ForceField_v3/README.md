@@ -1,6 +1,6 @@
 # Joystick Force Field Controller (Arduino Mega 2560)
 
-This repository contains the Arduino control code for a joystick-based force-field behavioral apparatus used with **Bpod**. The sketch runs on an **Arduino Mega 2560** and coordinates joystick sampling, motor control, return TTL signals to Bpod, position-dependent buzzer output, and LED feedback.
+This repository contains the Arduino control code for a joystick-based force-field behavioral apparatus used with **Bpod**. The sketch runs on an **Arduino Mega 2560** and coordinates joystick sampling, motor control, return TTL signals to Bpod, optional position-dependent buzzer output, and LED feedback.
 
 The current release file is:
 
@@ -14,7 +14,7 @@ The sketch performs five core functions:
 2. Receives a one-byte motor amplitude command from **Bpod** over `Serial1`.
 3. Drives **Motor A** continuously during Bpod-defined force states when joystick displacement exceeds the force-on threshold.
 4. Returns TTL signals to **Bpod** for force-on detection, too-early movement detection, and successful reach detection.
-5. Drives a **position-dependent buzzer** and **LED sequences** during Bpod-defined task states.
+5. Optionally drives a **position-dependent buzzer** and **LED sequences** during Bpod-defined task states.
 
 ## Behavioral logic
 
@@ -71,14 +71,11 @@ As above, repeated pulsing is intentional and is used to reduce the chance of mi
 
 `kBuzzerTrigPin` is a **Bpod-controlled state gate**.
 
-When `kBuzzerTrigPin` is `HIGH`, Arduino enters the **active monitoring state**. During this state, the sketch does two things at the same time:
+When `kBuzzerTrigPin` is `HIGH`, Arduino enters the **active monitoring state**. During this state, the sketch always evaluates joystick position for successful reach detection and can optionally drive buzzer output based on joystick position.
 
-- evaluates joystick position for successful reach detection
-- drives buzzer output based on joystick position
+#### Optional buzzer logic
 
-#### Buzzer logic
-
-During the active monitoring state:
+The buzzer behavior is optional. When enabled during the active monitoring state:
 
 - if `diffX < kBuzzerXGate` and `diffY > kBuzzerYGate`, the buzzer frequency is updated as a function of joystick position:
   - `frequency = (diffY * diffY) / 5 + kBaseBuzzerHz`
@@ -148,7 +145,7 @@ If your setup also uses additional local support libraries, keep them in the rep
 - `kLedSeq1TrigPin = 22` — Bpod output for LED sequence 1
 - `kLedSeq2TrigPin = 23` — Bpod output for LED sequence 2
 - `kSlideTrigPin = 2` — Bpod output for slide reset trigger
-- `kBuzzerTrigPin = 24` — Bpod state gate for active monitoring and buzzer output
+- `kBuzzerTrigPin = 24` — Bpod state gate for active monitoring and optional buzzer output
 - `kForceOnsetMonitorPin = 25` — Bpod gate for force-on return pulses
 - `kForceEnablePin = 26` — Bpod gate enabling continuous Motor A force output
 - `kPosXPin = A8` — joystick X analog input
@@ -239,4 +236,4 @@ This code is written for a specific joystick + motor + Bpod behavioral rig. Anyo
 
 ## Code availability statement template
 
-Custom Arduino code used for joystick position sampling, motorized force-field control, TTL communication with Bpod, position-dependent buzzer output, and LED control is available in this repository. The repository includes the exact Arduino sketch used for behavioral control, along with required dependencies and instructions for compilation and upload.
+Custom Arduino code used for joystick position sampling, motorized force-field control, TTL communication with Bpod, optional position-dependent buzzer output, and LED control is available in this repository. The repository includes the exact Arduino sketch used for behavioral control, along with required dependencies and instructions for compilation and upload.
