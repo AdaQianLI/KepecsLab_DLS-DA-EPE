@@ -67,7 +67,7 @@ Arduino sends **repeated 2 ms TTL pulses** back to Bpod while the condition rema
 
 As above, repeated pulsing is intentional and is used to reduce the chance of missed event detection by Bpod.
 
-### 5) Active monitoring state, buzzer output, and reach detection
+### 5) Active monitoring state, optional buzzer output, and reach detection
 
 `kBuzzerTrigPin` is a **Bpod-controlled state gate**.
 
