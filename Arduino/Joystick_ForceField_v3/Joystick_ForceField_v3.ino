@@ -46,11 +46,11 @@ constexpr uint16_t kTtlPulseMs = 2;          // Pulse width for Bpod return puls
 constexpr uint16_t kMotorCommandPauseUs = 300;
 
 // Joystick baseline and thresholds (ADC units)
-volatile int16_t gBaselineX = 354;
-volatile int16_t gBaselineY = 368;
-constexpr int16_t kXWindowLimit = 60;
-constexpr int16_t kForceOffsetThresholdY = 50;  // reach / force-off threshold
-constexpr int16_t kForceOnsetThresholdY = 20;   // force-on threshold
+volatile int16_t gBaselineX = 521;
+volatile int16_t gBaselineY = 521;
+constexpr int16_t kXWindowLimit = 50;             // reach / force-off X threshold
+constexpr int16_t kForceOffsetThresholdY = 120;  // reach / force-off Y threshold
+constexpr int16_t kForceOnsetThresholdY = 40;   // force-on  threshold
 constexpr int16_t kTooEarlyThresholdY = 100;    // early movement threshold
 
 // Buzzer shaping thresholds (ADC units)
@@ -355,7 +355,7 @@ void updateForceMotor(const int16_t /*diffX*/, const int16_t diffY) {
 }
 
 void updateTooEarlyPulse(const int16_t diffX, const int16_t diffY) {
-  if ((diffY > kTooEarlyThresholdY) && (diffX < kXWindowLimit)) {
+  if (diffY > kTooEarlyThresholdY) {
     // Return repeated brief pulses to Bpod while the too-early
     // criterion remains true. Repeated pulses are intentional here.
     sendPulse(kTtlTooEarlyPin, kTtlPulseMs);
