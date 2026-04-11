@@ -14,7 +14,7 @@
   - Drive Motor A continuously during Bpod-defined force states.
   - Drive Motor B for the slide-close / recenter sequence.
   - Return brief TTL pulses to Bpod for force-on and too-early event detection.
-  - Provide a reach-level TTL signal, buzzer feedback, and LED feedback.
+  - Provide a reach-level TTL signal, go_cue feedback, and LED feedback.
 
   Behavioral note
   - Motor force is applied continuously while the joystick is above the
@@ -53,10 +53,10 @@ constexpr int16_t kForceOffsetThresholdY = 120;  // reach / force-off Y threshol
 constexpr int16_t kForceOnsetThresholdY = 40;   // force-on  threshold
 constexpr int16_t kTooEarlyThresholdY = 100;    // early movement threshold
 
-// Buzzer shaping thresholds (ADC units)
-constexpr int16_t kBuzzerXGate = 50;
-constexpr int16_t kBuzzerYGate = 40;
-constexpr uint16_t kBaseBuzzerHz = 2000;
+// go_cue shaping thresholds (ADC units)
+constexpr int16_t kgo_cueXGate = 50;
+constexpr int16_t kgo_cueYGate = 40;
+constexpr uint16_t kBasego_cueHz = 2000;
 
 // -----------------------------------------------------------------------------
 // GPIO mapping
@@ -65,10 +65,10 @@ constexpr uint8_t kLedDataOutPin = 37;   // WS2811 data pin
 constexpr uint8_t kLedSeq1TrigPin = 22;  // Bpod BNC OUT 1
 constexpr uint8_t kLedSeq2TrigPin = 23;  // Bpod BNC OUT 2
 constexpr uint8_t kSlideTrigPin = 2;     // Bpod Wire OUT 1
-constexpr uint8_t kBuzzerTrigPin = 24;   // Bpod Wire OUT 2; state gate for position monitoring and buzzer output
+constexpr uint8_t kgo_cueTrigPin = 24;   // Bpod Wire OUT 2; state gate for position monitoring and go_cue output
 constexpr uint8_t kForceOnsetMonitorPin = 25;   // Bpod Wire OUT 3
 constexpr uint8_t kForceEnablePin = 26;  // Bpod Wire OUT 4
-constexpr uint8_t kBuzzerOutPin = 36;
+constexpr uint8_t kgo_cueOutPin = 36;
 constexpr uint8_t kTtlReachPin = 30;     // Bpod Wire IN 1
 constexpr uint8_t kTtlForceOnPin = 31;   // Bpod Wire IN 2
 constexpr uint8_t kTtlTooEarlyPin = 32;    // Bpod Wire IN 3
@@ -115,7 +115,7 @@ void processLatestJoystickSample();
 void processJoystickSample(const int16_t posX, const int16_t posY);
 void updateForceMotor(const int16_t diffX, const int16_t diffY);
 void updateTooEarlyPulse(const int16_t diffX, const int16_t diffY);
-void updateBuzzerAndReachTtl(const int16_t diffX, const int16_t diffY);
+void updatego_cueAndReachTtl(const int16_t diffX, const int16_t diffY);
 void updateLedSequences();
 void recalibrateBaseline();
 void runSlideCloseSequence();
@@ -255,8 +255,8 @@ void setup() {
   pinMode(kLedSeq2TrigPin, INPUT);
   pinMode(kInternalLedPin, OUTPUT);
 
-  pinMode(kBuzzerTrigPin, INPUT);
-  pinMode(kBuzzerOutPin, OUTPUT);
+  pinMode(kgo_cueTrigPin, INPUT);
+  pinMode(kgo_cueOutPin, OUTPUT);
 
   pinMode(kTtlReachPin, OUTPUT);
   pinMode(kTtlForceOnPin, OUTPUT);
@@ -332,7 +332,7 @@ void processJoystickSample(const int16_t posX, const int16_t posY) {
 
   updateForceMotor(gDiffX, gDiffY);
   updateTooEarlyPulse(gDiffX, gDiffY);
-  updateBuzzerAndReachTtl(gDiffX, gDiffY);
+  updatego_cueAndReachTtl(gDiffX, gDiffY);
 }
 
 void updateForceMotor(const int16_t /*diffX*/, const int16_t diffY) {
@@ -362,16 +362,16 @@ void updateTooEarlyPulse(const int16_t diffX, const int16_t diffY) {
   }
 }
 
-void updateBuzzerAndReachTtl(const int16_t diffX, const int16_t diffY) {
-  // kBuzzerTrigPin is a Bpod-controlled state gate. When HIGH, Arduino
+void updatego_cueAndReachTtl(const int16_t diffX, const int16_t diffY) {
+  // kgo_cueTrigPin is a Bpod-controlled state gate. When HIGH, Arduino
   // enters the active monitoring state: it evaluates joystick position,
-  // drives position-dependent buzzer output, and returns reach detection
+  // drives position-dependent go_cue output, and returns reach detection
   // to Bpod on kTtlReachPin.
-  if (digitalRead(kBuzzerTrigPin) == HIGH) {
-    if ((diffX < kBuzzerXGate) && (diffY > kBuzzerYGate)) {
-      tone(kBuzzerOutPin, static_cast<unsigned int>((diffY * diffY) / 5 + kBaseBuzzerHz));
+  if (digitalRead(kgo_cueTrigPin) == HIGH) {
+    if ((diffX < kgo_cueXGate) && (diffY > kgo_cueYGate)) {
+      tone(kgo_cueOutPin, static_cast<unsigned int>((diffY * diffY) / 5 + kBasego_cueHz));
     } else {
-      tone(kBuzzerOutPin, kBaseBuzzerHz);
+      tone(kgo_cueOutPin, kBasego_cueHz);
     }
 
     // Return a sustained HIGH signal to Bpod while the reach criterion is
@@ -382,9 +382,9 @@ void updateBuzzerAndReachTtl(const int16_t diffX, const int16_t diffY) {
       digitalWrite(kTtlReachPin, LOW);
     }
   } else {
-    // Outside the Bpod monitoring state, buzzer output is disabled and the
+    // Outside the Bpod monitoring state, go_cue output is disabled and the
     // reach-return line is held LOW.
-    noTone(kBuzzerOutPin);
+    noTone(kgo_cueOutPin);
     digitalWrite(kTtlReachPin, LOW);
   }
 }
